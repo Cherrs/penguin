@@ -1,16 +1,11 @@
-mod message_client;
+mod ricq_client;
 
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
+use thiserror::Error;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+#[derive(Error, Debug)]
+pub enum MessageClientError {
+    #[error("获取二维码失败")]
+    FetchQrcodeFail,
+    #[error("获取扫码状态失败")]
+    GetQrcodeStateFail,
 }
