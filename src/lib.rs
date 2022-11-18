@@ -1,4 +1,4 @@
-mod ricq_client;
+pub mod ricq;
 
 use thiserror::Error;
 
