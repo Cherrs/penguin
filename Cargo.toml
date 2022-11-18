@@ -6,16 +6,20 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+ricq = { git = "https://github.com/lz1998/ricq" }
 #错误处理
 thiserror = "1"
-
-#异步trait
-async-trait = "0.1"
-
 #bytes
 bytes = "1"
+#serde
+serde_json = "1"
+
+#异步
+tokio = { version = "1", features = ["full"] }
+
+tracing = "0.1"
+
+[dev-dependencies]
+tracing-subscriber = "0.3.0"
 [workspace]
-members = [
-    "penguin-tauri",
-    "ricq-client",
-]
+members = ["penguin-tauri"]
