@@ -18,7 +18,7 @@ pub struct RicqClient {
 
 impl RicqClient {
     /// 初始化Client
-    async fn init() -> Self {
+    pub async fn init() -> Self {
         let device = match Path::new("device.json").exists() {
             true => serde_json::from_str(
                 &tokio::fs::read_to_string("device.json")
@@ -52,7 +52,7 @@ impl RicqClient {
         }
     }
 
-    async fn get_login_qrcode(&self) -> Result<Bytes, MessageClientError> {
+    pub async fn get_login_qrcode(&self) -> Result<Bytes, MessageClientError> {
         let qrcode_result = self.client.fetch_qrcode().await;
         match qrcode_result {
             Ok(state) => match state {
@@ -69,7 +69,7 @@ impl RicqClient {
         }
     }
 
-    async fn get_qrcode_state(&self) -> Result<QRCodeState, MessageClientError> {
+    pub async fn get_qrcode_state(&self) -> Result<QRCodeState, MessageClientError> {
         let sig = self.sig.lock().unwrap().clone();
         let qrcode_state = self.client.query_qrcode_result(&sig).await;
         match qrcode_state {
