@@ -11,6 +11,9 @@ thiserror = "1"
 
 #异步trait
 async-trait = "0.1"
+
+#bytes
+bytes = "1"
 [workspace]
 members = [
     "penguin-tauri",
