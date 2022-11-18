@@ -1,0 +1,18 @@
+[package]
+name = "penguin"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+#错误处理
+thiserror = "1"
+
+#异步trait
+async-trait = "0.1"
+[workspace]
+members = [
+    "penguin-tauri",
+    "ricq-client",
+]
