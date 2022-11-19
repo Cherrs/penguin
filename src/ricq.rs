@@ -104,8 +104,4 @@ mod tests {
 
         println!("{bytes:?}");
     }
-    #[test]
-    fn get_a() {
-        println!("123");
-    }
 }
