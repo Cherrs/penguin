@@ -1,8 +1,8 @@
 {
   "build": {
-    "beforeDevCommand": "npm run dev",
-    "beforeBuildCommand": "npm run build",
-    "devPath": "../svelte-ui",
+    "beforeDevCommand": "npm run --prefix svelte-ui dev",
+    "beforeBuildCommand": "npm run --prefix svelte-ui build",
+    "devPath": "http://localhost:5173/",
     "distDir": "../svelte-ui/dist",
     "withGlobalTauri": true
   },
@@ -56,10 +56,10 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 600,
+        "height": 708,
         "resizable": true,
         "title": "penguin",
-        "width": 800
+        "width": 1120
       }
     ]
   }
