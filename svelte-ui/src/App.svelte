@@ -1,13 +1,16 @@
 <script>
-  import Counter from "./lib/Counter.svelte";
+  import Login from "./lib/Login/Login.svelte";
+  import Main from "./lib/Main.svelte";
+
+  let is_login = false;
 </script>
 
 <main>
-  <h1>Hello Penguin</h1>
-
-  <div class="card">
-    <Counter />
-  </div>
+  {#if !is_login}
+    <Login />
+  {:else}
+    <Main />
+  {/if}
 </main>
 
 <style>

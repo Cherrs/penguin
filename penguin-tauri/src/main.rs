@@ -2,6 +2,7 @@
     all(not(debug_assertions), target_os = "windows"),
     windows_subsystem = "windows"
 )]
+mod login;
 
 use penguin::ricq::RicqClient;
 use tracing::Level;
@@ -12,6 +13,7 @@ use tracing_subscriber::FmtSubscriber;
 fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
+
 #[tokio::main]
 async fn main() {
     let subscriber = FmtSubscriber::builder()
@@ -27,7 +29,7 @@ async fn main() {
     tauri::Builder::default()
         //使用tauri状态管理共享client
         .manage(client)
-        .invoke_handler(tauri::generate_handler![greet])
+        .invoke_handler(tauri::generate_handler![greet, login::get_qrcode])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

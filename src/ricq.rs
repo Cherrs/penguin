@@ -1,5 +1,6 @@
 use crate::MessageClientError;
 use bytes::{Bytes, BytesMut};
+use rand::Rng;
 use ricq::{
     client::{Connector, DefaultConnector},
     handler::DefaultHandler,
@@ -27,18 +28,14 @@ impl RicqClient {
             )
             .expect("failed to parse device info"),
             false => {
-                let d = Device::random();
+                let d = build_delives(Device::random());
                 tokio::fs::write("device.json", serde_json::to_string(&d).unwrap())
                     .await
                     .expect("failed to write device info to file");
                 d
             }
         };
-        let client = Arc::new(Client::new(
-            device,
-            Protocol::AndroidWatch.into(),
-            DefaultHandler,
-        ));
+        let client = Arc::new(Client::new(device, Protocol::MacOS.into(), DefaultHandler));
         tokio::spawn({
             let client = client.clone();
             let stream = DefaultConnector.connect(&client).await.unwrap();
@@ -79,6 +76,28 @@ impl RicqClient {
                 Err(MessageClientError::GetQrcodeStateFail)
             }
         }
+    }
+    /// 获取登录二维码的Base64图片
+    pub async fn get_login_qrcode_base64(&self) -> Result<String, MessageClientError> {
+        let qrcode = self.get_login_qrcode().await?;
+        let base64str = format!("data:image/png;base64,{}", base64::encode(qrcode));
+        Ok(base64str)
+    }
+}
+
+/// 生成登录设备
+fn build_delives(device: Device) -> Device {
+    let mut rng = rand::thread_rng();
+    Device {
+        model: "Penguin A".into(),
+        brand: "Penguin".into(),
+        vendor_name: "Penguin APP".into(),
+        display: format!("Penguin.{}.001", rng.gen_range(100000..999999)),
+        finger_print: format!(
+            "penguin/iarim/sagit:10/eomam.200122.001/{}:user/release-keys",
+            rng.gen_range(1000000..9999999)
+        ),
+        ..device
     }
 }
 
