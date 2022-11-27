@@ -1,15 +1,14 @@
 <script>
   import Login from "./lib/Login/Login.svelte";
   import Main from "./lib/Main.svelte";
-
-  let is_login = false;
+  import { is_login } from "./store";
 </script>
 
 <main>
-  {#if !is_login}
-    <Login />
-  {:else}
+  {#if $is_login}
     <Main />
+  {:else}
+    <Login />
   {/if}
 </main>
 
