@@ -1,6 +1,19 @@
 <script>
     import { invoke } from "@tauri-apps/api/tauri";
-
+    import { listen } from "@tauri-apps/api/event";
+    import { is_login } from "../../store";
+    invoke("get_qrcode_state_loop").then(async (state) => {
+        if (!state) {
+            listen("qrcode_state", (event) => {
+                console.log(event.payload);
+                if (event.payload.Confirmed) {
+                    console.log("登录成功！" + event.payload.Confirmed);
+                    is_login.set(true);
+                }
+            });
+            await invoke("start_get_qrcode_state");
+        }
+    });
     let img = invoke("get_qrcode");
 </script>
 
