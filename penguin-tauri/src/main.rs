@@ -9,6 +9,7 @@ mod login;
 use login::StateLoop;
 use penguin::ricq_client::RicqClient;
 use std::sync::Mutex;
+#[cfg(debug_assertions)]
 use tauri::Manager;
 use tracing::Level;
 use tracing_subscriber::FmtSubscriber;
@@ -40,10 +41,10 @@ async fn main() {
             friend::get_friend_list
         ])
         // debug环境下打开开发者工具
-        .setup(|app| {
+        .setup(|_app| {
             #[cfg(debug_assertions)] // only include this code on debug builds
             {
-                let window = app.get_window("main").unwrap();
+                let window = _app.get_window("main").unwrap();
                 window.open_devtools();
             }
             Ok(())
