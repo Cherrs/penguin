@@ -26,6 +26,13 @@ base64 = "0.13"
 #随机
 rand = "0.8"
 
+[profile.release]
+strip = true
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+
 [dev-dependencies]
 tracing-subscriber = "0.3.0"
 [workspace]
