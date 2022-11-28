@@ -55,7 +55,9 @@ impl RicqClient {
         match qrcode_result {
             Ok(state) => match state {
                 QRCodeState::ImageFetch(fetch) => {
-                    self.sig.lock().unwrap().put(fetch.sig);
+                    let mut sig = self.sig.lock().unwrap();
+                    sig.clear();
+                    sig.put(fetch.sig);
                     Ok(fetch.image_data)
                 }
                 _ => {
