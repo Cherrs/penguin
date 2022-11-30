@@ -1,8 +1,8 @@
 use std::sync::Mutex;
 use std::time::Duration;
 
-use penguin::ricq_client::RicqClient;
-use penguin::LoginState;
+use penguin::{LoginState, MessageClient};
+use ricq_client::RicqClient;
 use tauri::State;
 use tauri::Window;
 

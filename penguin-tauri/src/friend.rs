@@ -1,4 +1,5 @@
-use penguin::{ricq_client::RicqClient, FriendList};
+use penguin::{FriendList, MessageClient};
+use ricq_client::RicqClient;
 use tauri::State;
 
 #[tauri::command]

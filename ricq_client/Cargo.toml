@@ -1,0 +1,31 @@
+[package]
+name = "ricq_client"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+ricq = { git = "https://github.com/lz1998/ricq" }
+ricq-core = { git = "https://github.com/lz1998/ricq" }
+penguin = { path = ".." }
+#错误处理
+thiserror = "1"
+#bytes
+bytes = "1"
+#serde
+serde = "1"
+serde_json = "1"
+#异步
+tokio = { version = "1", features = ["full"] }
+
+tracing = "0.1"
+
+#base64
+base64 = "0.13"
+
+#随机
+rand = "0.8"
+
+[dev-dependencies]
+tracing-subscriber = "0.3.0"

@@ -1,8 +1,17 @@
-pub mod ricq_client;
+#![feature(async_fn_in_trait)]
 
+use bytes::Bytes;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use thiserror::Error;
+
+pub trait MessageClient {
+    async fn get_login_qrcode(&self) -> Result<Bytes, MessageClientError>;
+    async fn get_qrcode_state(&self) -> Result<LoginState, MessageClientError>;
+    async fn get_account(&self) -> Result<AccountInfo, MessageClientError>;
+    async fn get_friend_list(&self) -> Result<FriendList, MessageClientError>;
+    async fn get_login_qrcode_base64(&self) -> Result<String, MessageClientError>;
+}
 
 #[derive(Error, Debug)]
 pub enum MessageClientError {
@@ -42,18 +51,6 @@ pub struct FriendInfo {
     pub group_id: u8,
 }
 
-impl From<ricq::structs::FriendInfo> for FriendInfo {
-    fn from(value: ricq::structs::FriendInfo) -> Self {
-        FriendInfo {
-            face_id: value.face_id,
-            group_id: value.group_id,
-            nick: value.nick,
-            remark: value.remark,
-            uin: value.uin,
-        }
-    }
-}
-
 /// 好友分组信息
 #[derive(Debug, Default, Clone, Deserialize, Serialize)]
 pub struct FriendGroupInfo {
@@ -62,18 +59,6 @@ pub struct FriendGroupInfo {
     pub friend_count: i32,
     pub online_friend_count: i32,
     pub seq_id: u8,
-}
-
-impl From<ricq::structs::FriendGroupInfo> for FriendGroupInfo {
-    fn from(value: ricq::structs::FriendGroupInfo) -> Self {
-        FriendGroupInfo {
-            group_id: value.group_id,
-            group_name: value.group_name,
-            friend_count: value.friend_count,
-            online_friend_count: value.online_friend_count,
-            seq_id: value.seq_id,
-        }
-    }
 }
 
 /// 好友列表
@@ -87,21 +72,6 @@ pub struct FriendList {
     pub total_count: i16,
     /// 在线好友数量
     pub online_friend_count: i16,
-}
-
-impl From<ricq_core::command::friendlist::FriendListResponse> for FriendList {
-    fn from(value: ricq_core::command::friendlist::FriendListResponse) -> Self {
-        FriendList {
-            friends: value.friends.into_iter().map(|f| f.into()).collect(),
-            friend_groups: value
-                .friend_groups
-                .into_iter()
-                .map(|f| (f.0, FriendGroupInfo::from(f.1)))
-                .collect::<HashMap<u8, FriendGroupInfo>>(),
-            total_count: value.total_count,
-            online_friend_count: value.online_friend_count,
-        }
-    }
 }
 
 /// 账户信息

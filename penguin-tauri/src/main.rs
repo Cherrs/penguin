@@ -7,7 +7,7 @@ mod friend;
 mod login;
 
 use login::StateLoop;
-use penguin::ricq_client::RicqClient;
+use ricq_client::RicqClient;
 use std::sync::Mutex;
 #[cfg(debug_assertions)]
 use tauri::Manager;

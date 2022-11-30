@@ -1,5 +1,7 @@
-use crate::{AccountInfo, FriendList, LoginState, MessageClientError, QrcodeConfirmed};
+#![feature(async_fn_in_trait)]
+
 use bytes::{BufMut, Bytes, BytesMut};
+use penguin::*;
 use rand::Rng;
 use ricq::{
     client::{Connector, DefaultConnector},
@@ -13,11 +15,14 @@ use std::{
 };
 use tracing::{error, trace};
 
+use crate::convert::to_friend_list_response;
+
+pub mod convert;
+
 pub struct RicqClient {
     client: Arc<Client>,
     sig: Mutex<BytesMut>,
 }
-
 impl RicqClient {
     /// 初始化Client
     pub async fn init() -> Self {
@@ -49,8 +54,21 @@ impl RicqClient {
             sig: Mutex::new(BytesMut::with_capacity(24)),
         }
     }
+    async fn login(&self, state: &QRCodeConfirmed) -> Result<LoginResponse, MessageClientError> {
+        match self
+            .client
+            .qrcode_login(&state.tmp_pwd, &state.tmp_no_pic_sig, &state.tgt_qr)
+            .await
+        {
+            Ok(r) => Ok(r),
+            Err(_) => Err(MessageClientError::LoginFail),
+        }
+    }
+}
+
+impl MessageClient for RicqClient {
     /// 获取登录二维码
-    pub async fn get_login_qrcode(&self) -> Result<Bytes, MessageClientError> {
+    async fn get_login_qrcode(&self) -> Result<Bytes, MessageClientError> {
         let qrcode_result = self.client.fetch_qrcode().await;
         match qrcode_result {
             Ok(state) => match state {
@@ -72,7 +90,7 @@ impl RicqClient {
         }
     }
     /// 获取登录状态
-    pub async fn get_qrcode_state(&self) -> Result<LoginState, MessageClientError> {
+    async fn get_qrcode_state(&self) -> Result<LoginState, MessageClientError> {
         trace!("获取登录状态");
         let sig = self.sig.lock().unwrap().clone();
         let qrcode_state = self.client.query_qrcode_result(&sig).await;
@@ -104,16 +122,16 @@ impl RicqClient {
     }
 
     /// 获取登录二维码的Base64图片
-    pub async fn get_login_qrcode_base64(&self) -> Result<String, MessageClientError> {
+    async fn get_login_qrcode_base64(&self) -> Result<String, MessageClientError> {
         let qrcode = self.get_login_qrcode().await?;
         let base64str = format!("data:image/png;base64,{}", base64::encode(qrcode));
         Ok(base64str)
     }
     /// 获取好友列表
-    pub async fn get_friend_list(&self) -> Result<FriendList, MessageClientError> {
+    async fn get_friend_list(&self) -> Result<FriendList, MessageClientError> {
         trace!("获取好友列表");
         match self.client.get_friend_list().await {
-            Ok(list) => Ok(list.into()),
+            Ok(list) => Ok(to_friend_list_response(list)),
             Err(e) => {
                 error!("获取用户列表失败:{}", e);
                 Err(MessageClientError::GetFriendListFail)
@@ -121,7 +139,7 @@ impl RicqClient {
         }
     }
     /// 当前登录账户
-    pub async fn get_account(&self) -> Result<AccountInfo, MessageClientError> {
+    async fn get_account(&self) -> Result<AccountInfo, MessageClientError> {
         trace!("获取账户信息");
         let info = self.client.account_info.read().await;
         Ok(AccountInfo {
@@ -130,17 +148,6 @@ impl RicqClient {
             nickname: info.nickname.clone(),
             uin: self.client.uin().await,
         })
-    }
-
-    async fn login(&self, state: &QRCodeConfirmed) -> Result<LoginResponse, MessageClientError> {
-        match self
-            .client
-            .qrcode_login(&state.tmp_pwd, &state.tmp_no_pic_sig, &state.tgt_qr)
-            .await
-        {
-            Ok(r) => Ok(r),
-            Err(_) => Err(MessageClientError::LoginFail),
-        }
     }
 }
 
